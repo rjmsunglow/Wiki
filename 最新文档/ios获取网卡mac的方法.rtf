@@ -1,0 +1,118 @@
+{\rtf1\ansi\ansicpg936\cocoartf1187\cocoasubrtf390
+{\fonttbl\f0\fnil\fcharset0 Consolas;\f1\fnil\fcharset134 STHeitiSC-Light;\f2\fnil\fcharset0 Consolas-Bold;
+}
+{\colortbl;\red255\green255\blue255;\red255\green255\blue255;\red38\green38\blue38;\red109\green109\blue109;
+\red15\green114\blue3;\red10\green82\blue135;\red0\green0\blue255;\red251\green0\blue129;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sl300
+
+\f0\fs28 \cf0 \cb2 iOS
+\f1 \'d6\'d0\'bb\'f1\'c8\'a1\'cd\'f8\'bf\'a8
+\f0 mac
+\f1 \'b5\'c4\'b4\'fa\'c2\'eb\'c8\'e7\'cf\'c2\'a3\'ba
+\f0 \cf3 \
+\pard\pardeftab720\sl300
+\cf4 #include <sys/socket.h> // Per msqr\cf3 \
+\cf4 #include <sys/sysctl.h>\cf3 \
+\cf4 #include <net/if.h>\cf3 \
+\cf4 #include <net/if_dl.h>\cf3 \
+\'a0\'a0\
+\cf4 #pragma mark MAC addy\cf3 \
+\pard\pardeftab720\sl300
+\cf5 // Return the local MAC addy\cf3 \
+\cf5 // Courtesy of FreeBSD hackers email list\cf3 \
+\cf5 // Accidentally munged during previous update. Fixed thanks to mlamb.\cf3 \
+\pard\pardeftab720\sl300
+\cf0 - (NSString *) macaddress\cf3 \
+\cf0 \{\cf3 \
+\'a0\'a0\'a0\'a0
+\f2\b \cf4 int
+\f0\b0 \cf3 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf0 mib[6];\cf3 \
+\'a0\'a0\'a0\'a0
+\f2\b \cf4 size_t
+\f0\b0 \cf3 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf0 len;\cf3 \
+\'a0\'a0\'a0\'a0
+\f2\b \cf4 char
+\f0\b0 \cf3 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf0 *buf;\cf3 \
+\'a0\'a0\'a0\'a0\cf0 unsigned 
+\f2\b \cf4 char
+\f0\b0 \cf3 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf0 *ptr;\cf3 \
+\'a0\'a0\'a0\'a0
+\f2\b \cf6 struct
+\f0\b0 \cf3  \cf0 if_msghdr\'a0\'a0\'a0 *ifm;\cf3 \
+\'a0\'a0\'a0\'a0
+\f2\b \cf6 struct
+\f0\b0 \cf3  \cf0 sockaddr_dl\'a0\'a0\'a0 *sdl;\cf3 \
+\'a0\'a0\'a0\'a0\
+\'a0\'a0\'a0\'a0\cf0 mib[0] = CTL_NET;\cf3 \
+\'a0\'a0\'a0\'a0\cf0 mib[1] = AF_ROUTE;\cf3 \
+\'a0\'a0\'a0\'a0\cf0 mib[2] = 0;\cf3 \
+\'a0\'a0\'a0\'a0\cf0 mib[3] = AF_LINK;\cf3 \
+\'a0\'a0\'a0\'a0\cf0 mib[4] = NET_RT_IFLIST;\cf3 \
+\'a0\'a0\'a0\'a0\
+\'a0\'a0\'a0\'a0
+\f2\b \cf6 if
+\f0\b0 \cf3  \cf0 ((mib[5] = if_nametoindex(\cf7 "en0"\cf0 )) == 0) \{\cf3 \
+\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0
+\f2\b \cf8 printf
+\f0\b0 \cf0 (\cf7 "Error: if_nametoindex error/n"\cf0 );\cf3 \
+\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0
+\f2\b \cf6 return
+\f0\b0 \cf3  \cf0 NULL;\cf3 \
+\'a0\'a0\'a0\'a0\cf0 \}\cf3 \
+\'a0\'a0\'a0\'a0\
+\'a0\'a0\'a0\'a0
+\f2\b \cf6 if
+\f0\b0 \cf3  \cf0 (sysctl(mib, 6, NULL, &len, NULL, 0) < 0) \{\cf3 \
+\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0
+\f2\b \cf8 printf
+\f0\b0 \cf0 (\cf7 "Error: sysctl, take 1/n"\cf0 );\cf3 \
+\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0
+\f2\b \cf6 return
+\f0\b0 \cf3  \cf0 NULL;\cf3 \
+\'a0\'a0\'a0\'a0\cf0 \}\cf3 \
+\'a0\'a0\'a0\'a0\
+\'a0\'a0\'a0\'a0
+\f2\b \cf6 if
+\f0\b0 \cf3  \cf0 ((buf = 
+\f2\b \cf8 malloc
+\f0\b0 \cf0 (len)) == NULL) \{\cf3 \
+\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0
+\f2\b \cf8 printf
+\f0\b0 \cf0 (\cf7 "Could not allocate memory. error!/n"\cf0 );\cf3 \
+\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0
+\f2\b \cf6 return
+\f0\b0 \cf3  \cf0 NULL;\cf3 \
+\'a0\'a0\'a0\'a0\cf0 \}\cf3 \
+\'a0\'a0\'a0\'a0\
+\'a0\'a0\'a0\'a0
+\f2\b \cf6 if
+\f0\b0 \cf3  \cf0 (sysctl(mib, 6, buf, &len, NULL, 0) < 0) \{\cf3 \
+\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0
+\f2\b \cf8 printf
+\f0\b0 \cf0 (\cf7 "Error: sysctl, take 2"\cf0 );\cf3 \
+\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0
+\f2\b \cf6 return
+\f0\b0 \cf3  \cf0 NULL;\cf3 \
+\'a0\'a0\'a0\'a0\cf0 \}\cf3 \
+\'a0\'a0\'a0\'a0\
+\'a0\'a0\'a0\'a0\cf0 ifm = (
+\f2\b \cf6 struct
+\f0\b0 \cf3  \cf0 if_msghdr *)buf;\cf3 \
+\'a0\'a0\'a0\'a0\cf0 sdl = (
+\f2\b \cf6 struct
+\f0\b0 \cf3  \cf0 sockaddr_dl *)(ifm + 1);\cf3 \
+\'a0\'a0\'a0\'a0\cf0 ptr = (unsigned 
+\f2\b \cf4 char
+\f0\b0 \cf3  \cf0 *)LLADDR(sdl);\cf3 \
+\'a0\'a0\'a0\'a0\cf5 // NSString *outstring = [NSString stringWithFormat:@"%02x:%02x:%02x:%02x:%02x:%02x", *ptr, *(ptr+1), *(ptr+2), *(ptr+3), *(ptr+4), *(ptr+5)];\cf3 \
+\'a0\'a0\'a0\'a0\cf0 NSString *outstring = [NSString stringWithFormat:@\cf7 "%02x%02x%02x%02x%02x%02x"\cf0 , *ptr, *(ptr+1), *(ptr+2), *(ptr+3), *(ptr+4), *(ptr+5)];\cf3 \
+\'a0\'a0\'a0\'a0
+\f2\b \cf8 free
+\f0\b0 \cf0 (buf);\cf3 \
+\'a0\'a0\'a0\'a0
+\f2\b \cf6 return
+\f0\b0 \cf3  \cf0 [outstring uppercaseString];\cf3 \
+\cf0 \}\cf3 \
+}
